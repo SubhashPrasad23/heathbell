@@ -1,26 +1,37 @@
 import React from "react";
-import { House, Pill, Search, UserPlus,CircleUserRound } from "lucide-react";
+import { House, Pill, Search, UserPlus, CircleUserRound } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const BottomTab = () => {
   const options = [
-    {  path: "/", icon: <House /> },
+    { path: "/", icon: <House /> },
     { path: "/add_medicine", icon: <Pill /> },
-    {  path: "/add_patient", icon: <UserPlus /> },
-    {  path: "/search", icon: <Search /> },
+    // { path: "/add_patient", icon: <UserPlus /> },
+    { path: "/search", icon: <Search /> },
+    { path: "/account", icon: <CircleUserRound /> },
   ];
   return (
-    <div className="w-full bg-teal-600 p-3 rounded-t-3xl flex items-center justify-between">
-      <ul className="flex items-center flex-1 ">
-        {options.map((option) => (
-          <li className="flex-1 flex flex-col place-items-center text-white hover:bg-white hover:text-teal-600 cursor-pointer p-2 rounded-lg">
-            {option.icon}
-          </li>
-        ))}
-      </ul>
-      <button className="place-items-center text-white hover:bg-white hover:text-teal-600 p-2  rounded-lg">
-      <CircleUserRound/>
-
-      </button>
+    <div className="w-full shadow-[0px_0px_5px_1px_black] rounded-t-3xl ">
+      <div className="flex items-center justify-between bg-teal-600 px-5 py-3 rounded-t-3xl shadow-inner shadow-teal-500">
+        <ul className="flex items-center flex-1 justify-between ">
+          {options.map((option, index) => (
+            <li key={index} className="">
+              <NavLink
+                to={option.path}
+                className={({ isActive }) =>
+                  `block p-1.5 rounded cursor-pointer shadow-inner ${
+                    isActive
+                      ? "bg-teal-500 text-white shadow-teal-400"
+                      : "bg-white text-teal-700 shadow-gray-300"
+                  } hover:bg-teal-400 hover:text-white transition rounded-full`
+                }
+              >
+                {option.icon}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

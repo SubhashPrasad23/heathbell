@@ -1,18 +1,18 @@
 import React from "react";
-import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 import BottomTab from "../components/BottomTab";
+import Header from "../components/Header";
 
 const MainLayout = () => {
   return (
-    <div className="w-full flex md:flex-row flex-col h-screen ">
-      <div className="2xl:w-2/12 lg:w-4/12 w-5/12 md:block hidden">
-        <Sidebar />
-      </div>
-      <div className="md:w-10/12 w-full  h-full">
-        <Outlet />
-      </div>
-      <div className=" w-full md:hidden block">
+    <div className="w-full h-screen">
+      <div className="h-full flex flex-col lg:w-2/6 md:w-2/4 w-full mx-auto border-x border-teal-600 bg-[rgb(236,242,248)]">
+        <Header />
+
+        <div className="flex-1 overflow-auto p-5">
+          <Outlet />
+        </div>
+
         <BottomTab />
       </div>
     </div>

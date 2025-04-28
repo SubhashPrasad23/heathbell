@@ -3,22 +3,37 @@ import { Eye, EyeOff } from "lucide-react";
 import Input from "./Input";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addUser } from "../features/user/userSlice";
 
 const LoginForm = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "12345" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(form);
-  };
+  const dispatch = useDispatch();
+  
 
-  const handleClick = () => {
-    navigate("/");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/auth/login`,
+        form,
+        { withCredentials: true }
+      );
+dispatch(addUser(response.data.data))
+      if (response.status === 200) {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -46,7 +61,7 @@ const LoginForm = () => {
         setShowPassword={setShowPassword}
       />
 
-      <Button name="Login" onClick={handleClick} />
+      <Button name="Login" />
     </form>
   );
 };

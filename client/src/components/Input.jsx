@@ -10,6 +10,7 @@ const Input = ({
   setShowPassword,
   showPassword,
   icon,
+  bgColor
 }) => {
   return (
     <div>
@@ -23,15 +24,15 @@ const Input = ({
           value={value}
           placeholder={placeholder}
           onChange={onChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className={`${bgColor} w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500`}
         />
-        <button
+     {showPassword&&   <button
           type="button"
           className={`absolute inset-y-0 right-0 flex items-center pr-3  text-lg  `}
           onClick={() => setShowPassword(!showPassword)}
         >
           {icon}
-        </button>
+        </button>}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
+import axios from "axios";
 
 const SignupForm = () => {
   const [form, setForm] = useState({
@@ -9,20 +10,30 @@ const SignupForm = () => {
     password: "",
     confirmPassword: "",
   });
+  console.log(form, "formmmmmmm");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-
-    console.log(form);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/auth/signup`,
+        
+          form
+        ,
+        { withCredentials: true }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
