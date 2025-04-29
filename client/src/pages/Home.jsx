@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Pill } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Pill, ArrowLeft } from "lucide-react";
 import axios from "axios";
 import { addMedicine } from "../features/medicine/medicine";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import MedicineCard from "../components/MedicineCard";
 import { addPatient } from "../features/patient/patientSlice";
+import MedicineForm from "../components/MedicineForm";
+import SuccessPopup from "../components/SuccessPopup";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -19,13 +21,33 @@ const Home = () => {
   const patients = useSelector((store) => store?.patient);
   const [selectedPatientId, setSelectedPatientId] = useState("");
   const [selectedPatient, setSelectedPatient] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    typeofMedicine: "",
+    dosage: "",
+    frequency: "",
+    startDate: "",
+    endDate: "",
+  });
+  const [times, setTimes] = useState([]);
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [selectedInstruction, setSelectedInstruction] = useState([]);
+  const [editingMedicine, setEditingMedicine] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
-  console.log(selectedPatientId, "selectedPatientId");
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handlePatientChange = (selectedPatient) => {
     localStorage.setItem("selectedPatientId", selectedPatient._id);
-    // onPatientChange(selectedPatient);
     setIsPatientDialogOpen(false);
     setSelectedPatientId(selectedPatient._id);
     setSelectedPatient(selectedPatient);
@@ -74,7 +96,6 @@ const Home = () => {
           { withCredentials: true }
         );
         dispatch(addMedicine(response?.data?.data));
-        console.log(response?.data?.data);
       } catch (error) {
         console.log(error);
       } finally {
@@ -99,30 +120,87 @@ const Home = () => {
     show: { opacity: 1, y: 0 },
   };
 
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    setIsSubmitting(true);
+
+    try {
+      const response = axios.post(
+        `${import.meta.env.VITE_BASE_URL}/medicine/${selectedPatientId}/${
+          editingMedicine?._id
+        }/editMedicine`,
+        {
+          name: formData.name,
+          typeofMedicine: formData.typeofMedicine,
+          dosage: formData.dosage,
+          frequency: formData.frequency,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          times: times,
+          daysOfWeek: selectedDays,
+          instructions: selectedInstruction,
+        },
+        { withCredentials: true }
+      );
+
+      setFormData({
+        name: "",
+        typeofMedicine: "",
+        dosage: "",
+        frequency: "",
+        startDate: "",
+        endDate: "",
+      });
+      setSelectedInstruction([]);
+      setSelectedDays([]);
+      setTimes([]);
+      setShowSuccess(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="w-full h-full flex flex-col flex-1 gap-5  ">
-      {patients.length > 0 && (
-        <motion.div
-          className="  bg-white py-2 px-5 shadow-[0px_3px_0px_5px_teal] rounded-lg "
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <div className="flex justify-between items-start ">
-            <div>
-              <h3 className="font-bold  uppercase">{selectedPatient.name}</h3>
-              <p className="text-sm text-gray-500">
-                {selectedPatient.age} years • {selectedPatient.gender}
-              </p>
-            </div>
-            <button
-              onClick={() => setIsPatientDialogOpen(true)}
-              className="text-emerald-600 hover:text-emerald-700 text-sm font-medium cursor-pointer "
-            >
-              Change
-            </button>
+      {isEditing ? (
+        <div className="flex items-center gap-2 ">
+          <div
+            onClick={() => setIsEditing(false)}
+            className="p-2 mr-3 rounded-full bg-teal-50 text-teal-600 hover:bg-teal-100 cursor-pointer"
+          >
+            <ArrowLeft />
           </div>
-        </motion.div>
+          <h4 className="text-xl font-semibold text-teal-700">
+            Update your medicine
+          </h4>
+        </div>
+      ) : (
+        patients.length > 0 && (
+          <motion.div
+            className="bg-white py-2 px-5 shadow-[0px_3px_0px_5px_teal] rounded-lg "
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex justify-between items-start font-MontSerrat">
+              <div>
+                <h3 className="font-bold uppercase">{selectedPatient.name}</h3>
+                <p className="text-sm text-gray-500">
+                  {selectedPatient.age} years • {selectedPatient.gender}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsPatientDialogOpen(true)}
+                className="text-emerald-600 hover:text-emerald-700 text-sm font-medium cursor-pointer"
+              >
+                Change
+              </button>
+            </div>
+          </motion.div>
+        )
       )}
 
       {isPatientDialogOpen && (
@@ -179,8 +257,36 @@ const Home = () => {
           </motion.div>
         </div>
       )}
+
       {isEditing ? (
-        <div>fg</div>
+        <div className="w-full flex-1 overflow-auto ">
+          <MedicineForm
+            handleSubmit={handleSave}
+            handleInputChange={handleInputChange}
+            isSubmitting={isSubmitting}
+            formData={formData}
+            setFormData={setFormData}
+            times={times}
+            setTimes={setTimes}
+            selectedDays={selectedDays}
+            setSelectedDays={setSelectedDays}
+            selectedInstruction={selectedInstruction}
+            setSelectedInstruction={setSelectedInstruction}
+          />
+          <AnimatePresence>
+            {showSuccess && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }} // 0.5 seconds
+                className="fixed inset-0  flex items-center justify-center  p-4 z-50"
+              >
+                <SuccessPopup message="updated medicine" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       ) : (
         <motion.div
           variants={container}
@@ -193,7 +299,12 @@ const Home = () => {
           ) : medicines.length > 0 ? (
             medicines.map((medicine) => (
               <div key={medicine._id}>
-                <MedicineCard medicine={medicine} setIsEditing={setIsEditing} />
+                <MedicineCard
+                  medicine={medicine}
+                  setIsEditing={setIsEditing}
+                  setEditingMedicine={setEditingMedicine}
+                  setFormData={setFormData}
+                />
               </div>
             ))
           ) : (
@@ -205,7 +316,7 @@ const Home = () => {
             >
               <motion.div
                 variants={item}
-                className="p-6 max-w-md w-full text-center"
+                className="p-6 max-w-md w-full text-center "
               >
                 <div className="flex justify-center mb-4">
                   <div className="bg-amber-100 p-4 rounded-full">
@@ -213,7 +324,7 @@ const Home = () => {
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-xl font-bold">
+                <p className="text-gray-600 text-xl font-bold font-MontSerrat">
                   No medicines have been added yet.
                 </p>
 

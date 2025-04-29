@@ -12,7 +12,7 @@ const Auth = () => {
   ];
 
   return (
-    <div className="lg:w-2/6 md:w-2/4 w-full mx-auto border-x-2 min-h-screen bg-[rgb(236,242,248)] flex items-center justify-center px-4 ">
+    <div className="lg:max-w-lg md:max-w-md w-full mx-auto border-x-2 min-h-screen bg-[rgb(236,242,248)] flex items-center justify-center px-4 ">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

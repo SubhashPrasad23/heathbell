@@ -6,7 +6,7 @@ import Header from "../components/Header";
 const MainLayout = () => {
   return (
     <div className="w-full h-screen">
-      <div className="h-full flex flex-col lg:w-2/6 md:w-2/4 w-full mx-auto border-x border-teal-600 bg-[rgb(236,242,248)]">
+      <div className="h-full flex flex-col lg:max-w-lg md:max-w-md  w-full mx-auto border-x border-teal-600 bg-[rgb(236,242,248)]">
         <Header />
 
         <div className="flex-1 overflow-auto p-5">

@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
 body{
     margin: 0;
@@ -14,4 +14,8 @@ body{
     .hideScrollbar {
       -ms-overflow-style: none; 
       scrollbar-width: none;    
+    }
+
+    @theme{
+      --font-MontSerrat:'Montserrat', 'sans-serif'
     }

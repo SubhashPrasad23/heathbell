@@ -19,7 +19,7 @@ const SuccessPopup = ({message}) => {
           You have successfully {message} !
         </span>
 
-        <button onClick={()=>navigate("/")} className=" bg-white py-2 px-4 rounded-lg shadow-inner shadow-gray-300 cursor-pointer text-teal-700">
+        <button onClick={()=>{navigate("/") ;console.log("click homeeee")}} className=" bg-white py-2 px-4 rounded-lg shadow-inner shadow-gray-300 cursor-pointer text-teal-700">
           Go Home
         </button>
       </div>

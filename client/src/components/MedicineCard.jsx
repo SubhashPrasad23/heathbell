@@ -5,7 +5,12 @@ import axios from "axios";
 import { removeMedicine } from "../features/medicine/medicine";
 import { useDispatch } from "react-redux";
 
-const MedicineCard = ({ medicine, setIsEditing }) => {
+const MedicineCard = ({
+  medicine,
+  setIsEditing,
+  setEditingMedicine,
+  setFormData,
+}) => {
   const dispatch = useDispatch();
   const storedId = localStorage.getItem("selectedPatientId");
 
@@ -23,10 +28,24 @@ const MedicineCard = ({ medicine, setIsEditing }) => {
       console.log(error);
     }
   };
+  console.log(medicine, "med name");
 
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setEditingMedicine(medicine);
+    setFormData({
+      name: medicine.name,
+      typeofMedicine: medicine.typeofMedicine,
+      dosage: medicine.dosage,
+      frequency: medicine.frequency,
+      startDate: "",
+      endDate: "",
+    });
   };
 
   return (
@@ -42,13 +61,12 @@ const MedicineCard = ({ medicine, setIsEditing }) => {
         </div>
         <div className="flex justify-end gap-2">
           <button
-            onClick={() => setIsEditing(true)}
+            onClick={handleEditClick}
             className="p-2 rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200 cursor-pointer"
           >
             <Edit size={18} />
           </button>
           <button
-            
             onClick={() => handleDeleteMedicine(medicine._id)}
             className="p-2 rounded-full bg-red-100 text-red-700 hover:bg-red-200 cursor-pointer"
           >
@@ -91,9 +109,3 @@ const MedicineCard = ({ medicine, setIsEditing }) => {
 };
 
 export default MedicineCard;
-
-
-
-medicineReminder
--client
--server
