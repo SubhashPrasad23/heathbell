@@ -14,21 +14,20 @@ const Search = () => {
 
   const handleSearch = async () => {
     setLoading(true);
-    setError("")
+    setError("");
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/search/medicineInfo`,
         { name },
         { withCredentials: true }
       );
-console.log(response)
+      console.log(response);
 
       if (response.data?.data?.error) {
         setError(response.data?.data.error);
         setMedicineData(null);
-      } 
-        setMedicineData(response.data?.data);
-      
+      }
+      setMedicineData(response.data?.data);
     } catch (err) {
       console.error(err);
       setError("An unexpected error occurred.");
@@ -46,7 +45,7 @@ console.log(response)
   return (
     <div className="w-full h-full flex flex-col flex-1 text-Montserrat">
       <div>
-        <p className="text-teal-700 font-semibold mb-2">
+        <p className="text-teal-700 text-lg font-semibold mb-2">
           Find detailed information about any medicine
         </p>
         <div className="bg-white rounded-xl transition-all duration-300">
@@ -57,7 +56,7 @@ console.log(response)
               onChange={(e) => setName(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search for a medicine..."
-              className="w-full p-4 pl-14 pr-36 text-lg outline-none"
+              className="w-full p-4 pl-14 pr-36  outline-none text-sm"
             />
             <SearchIcon
               className="absolute left-5 top-1/2 -translate-y-1/2 text-teal-500"
@@ -98,7 +97,7 @@ console.log(response)
                   className="text-black"
                 >
                   <div className="p-4 space-y-6 text-sm md:text-base">
-                    <h2 className="text-2xl font-bold text-teal-700">
+                    <h2 className="text-2xl p-2 font-bold text-teal-700 bg-white rounded-lg shadow-[2px_2px_0px_3px_teal]">
                       {medicineData.name}
                     </h2>
 
