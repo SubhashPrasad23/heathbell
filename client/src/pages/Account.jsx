@@ -3,17 +3,20 @@ import { AnimatePresence } from "framer-motion";
 import { LogOut, ChevronDown, UserPlus, Users, UserCircle } from "lucide-react";
 import AddPatient from "../components/AddPatient";
 import PatientsList from "../components/PatientsList";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
-  const [activeView, setActiveView] = useState("main");
   const [formData, setFormData] = useState({
     name: "",
     age: "",
     gender: "",
     contact: "",
   });
-  console.log(formData, "account");
+  const navigate = useNavigate()
+  const user = useSelector((store) => store?.user)
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -94,6 +97,11 @@ const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
       isLogout: true,
     },
   ];
+  const handleLogout = () => {
+    axios.post(`${import.meta.env.VITE_API_BASE_URL}/logout`, {}, { withCredentials: true });
+    navigate("/login");
+  };
+
 
   return (
     <div className="h-full flex flex-col ">
@@ -103,59 +111,47 @@ const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
             <UserCircle size={32} />
           </div>
           <div>
-            <h3 className="font-semibold md:text-lg">Admin User</h3>
-            <p className="text-gray-500 ">admin@mediremind.com</p>
+            <h3 className="font-semibold md:text-lg">{user?.fullName}</h3>
+            <p className="text-gray-500 ">{user?.email}</p>
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
         {options.map((option) => (
-          <NavLink key={option.id} to={option.path} className="block">
-            <button
-              onClick={() => setActiveView(option.id)}
-              className={`w-full bg-white shadow-inner border border-gray-300 shadow-gray-200 rounded-lg overflow-hidden cursor-pointer`}
-            >
-              <div className="p-5 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-full`}>{option.icon}</div>
-                  <div className="text-left">
-                    <h3 className="font-medium">{option.label}</h3>
-                    <p className="text-sm text-gray-500">
-                      {option.description}
-                    </p>
-                  </div>
+          <button
+            key={option.id}
+            onClick={() => {
+              if (option.isLogout) {
+                handleLogout();
+              } else {
+                navigate(option.path);  // programmatic navigation
+              }
+            }}
+            // onClick={() => setActiveView(option.id)}
+            className={`w-full bg-white shadow-inner border border-gray-300 shadow-gray-200 rounded-lg overflow-hidden cursor-pointer`}
+          >
+            <div className="p-5 flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className={`p-3 rounded-full`}>{option.icon}</div>
+                <div className="text-left">
+                  <h3 className="font-medium">{option.label}</h3>
+                  <p className="text-sm text-gray-500">
+                    {option.description}
+                  </p>
                 </div>
-                <ChevronDown size={20} className="text-gray-400" />
               </div>
-            </button>
-          </NavLink>
+              <ChevronDown size={20} className="text-gray-400" />
+            </div>
+          </button>
         ))}
       </div>
       <div className="flex-grow mt-4 overflow-auto">
-        <Outlet /> {/* 👈 Required to render nested routes */}
+        <Outlet />
       </div>
     </div>
 
-    // <div className="h-full flex flex-col overflow-auto ">
-    //   <AnimatePresence mode="wait">
-    //     {activeView === "main" && renderMainView()}
-    //     {activeView === "patients" && (
-    //       <PatientsList
-    //         setActiveView={setActiveView}
-    //         formData={formData}
-    //         setFormData={setFormData}
-    //       />
-    //     )}
-    //     {activeView === "addPatient" && (
-    //       <AddPatient
-    //         formData={formData}
-    //         setFormData={setFormData}
-    //         setActiveView={setActiveView}
-    //       />
-    //     )}
-    //   </AnimatePresence>
-    // </div>
+
   );
 };
 

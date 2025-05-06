@@ -10,7 +10,43 @@ const SignupForm = () => {
     password: "",
     confirmPassword: "",
   });
-  console.log(form, "formmmmmmm");
+  const [errors, setErrors] = useState({ fullName: "", email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
+
+
+
+  const validateForm = () => {
+    let isValid = true
+    const newErrors = { fullName: "", email: "", password: "" }
+
+    if (!form.fullName) {
+      newErrors.fullName = "Full name is required"
+      isValid = false
+
+    }
+
+
+    if (!form.email) {
+      newErrors.email = "Email is required"
+      isValid = false
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = "Email is invalid"
+      isValid = false
+    }
+
+    if (!form.password) {
+      newErrors.password = "Password is required"
+      isValid = false
+    }
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,21 +54,31 @@ const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true)
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
+    }
+
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
+
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/auth/signup`,
-        
-          form
+
+        form
         ,
         { withCredentials: true }
       );
       console.log(response);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false)
+
     }
   };
 
@@ -45,6 +91,8 @@ const SignupForm = () => {
         onChange={handleChange}
         placeholder="Enter your full name"
         label="Full name"
+        error={errors.fullName}
+
       />
 
       <Input
@@ -54,6 +102,8 @@ const SignupForm = () => {
         onChange={handleChange}
         placeholder="Enter your email"
         label="Email"
+        error={errors.email}
+
       />
 
       <Input
@@ -63,6 +113,8 @@ const SignupForm = () => {
         onChange={handleChange}
         label="Password"
         placeholder="Create a password"
+        error={errors.password}
+
       />
 
       <Input
@@ -72,10 +124,13 @@ const SignupForm = () => {
         onChange={handleChange}
         label="Confirm Password"
         placeholder="Confirm your password"
+        error={errors.confirmPassword}
+
       />
 
-      <Button name="Sign Up" />
+      <Button name="Sign Up" rounded={true} />
     </form>
+
   );
 };
 

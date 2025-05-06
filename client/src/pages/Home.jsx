@@ -180,7 +180,7 @@ const Home = () => {
       ) : (
         patients.length > 0 && (
           <motion.div
-            className="bg-white py-2 px-5 shadow-[0px_3px_0px_5px_teal] rounded-lg "
+            className=" py-2 px-5 shadow-[0px_3px_0px_5px_teal] rounded-lg "
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -204,11 +204,11 @@ const Home = () => {
       )}
 
       {isPatientDialogOpen && (
-        <div className="fixed inset-0  flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0  flex items-center justify-center z-50 p-4 ">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-lg max-w-md w-full "
+            className="bg-white rounded-2xl shadow-inner shadow-gray-300 max-w-md w-full border border-gray-200"
           >
             <div className="p-4 border-b border-teal-600">
               <div className="flex justify-between items-center">
@@ -229,8 +229,8 @@ const Home = () => {
                   key={patient._id}
                   onClick={() => handlePatientChange(patient)}
                   className={`flex items-center p-3 rounded-lg transition-all w-full cursor-pointer ${patient._id == selectedPatientId
-                      ? "bg-teal-600 shadow-inner shadow-teal-500 text-white"
-                      : "hover:bg-gray-200 border border-transparent"
+                    ? "bg-teal-600 shadow-inner shadow-teal-500 text-white"
+                    : "hover:bg-gray-200 border border-transparent"
                     }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -239,8 +239,8 @@ const Home = () => {
                     <p className="font-medium ">{patient.name}</p>
                     <p
                       className={`${patient._id == selectedPatientId
-                          ? " text-white"
-                          : "text-gray-500"
+                        ? " text-white"
+                        : "text-gray-500"
                         } text-xs `}
                     >
                       {patient.age} years • {patient.gender}

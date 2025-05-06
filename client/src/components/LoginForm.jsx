@@ -10,6 +10,31 @@ import { addUser } from "../features/user/userSlice";
 const LoginForm = () => {
   const [form, setForm] = useState({ email: "", password: "12345" });
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const validateForm = () => {
+    let isValid = true
+    const newErrors = { email: "", password: "" }
+
+    if (!form.email) {
+      newErrors.email = "Email is required"
+      isValid = false
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = "Email is invalid"
+      isValid = false
+    }
+
+    if (!form.password) {
+      newErrors.password = "Password is required"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
   const navigate = useNavigate();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,7 +45,11 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-console.log("lofjijf")
+    setIsLoading(true)
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/auth/login`,
@@ -33,11 +62,14 @@ console.log("lofjijf")
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false)
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 w-full">
+
+    <form onSubmit={handleSubmit} className="space-y-5 w-full ">
       <Input
         type="email"
         name="email"
@@ -46,6 +78,8 @@ console.log("lofjijf")
         placeholder="Enter your email"
         label="Email"
         required
+        error={errors.email}
+
       />
 
       <Input
@@ -59,9 +93,11 @@ console.log("lofjijf")
         icon={showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         showPassword={showPassword}
         setShowPassword={setShowPassword}
+        error={errors.password}
+
       />
 
-      <Button name="Login" />
+      <Button name="Login" rounded={true} />
     </form>
   );
 };

@@ -4,11 +4,11 @@ import { NavLink } from "react-router-dom";
 
 const BottomTab = () => {
   const options = [
-    { path: "/", icon: <House /> },
-    { path: "/add_medicine", icon: <Pill /> },
+    { path: "/", icon: <House size={30}/> },
+    { path: "/add_medicine", icon: <Pill size={30} /> },
     // { path: "/add_patient", icon: <UserPlus /> },
-    { path: "/search", icon: <Search /> },
-    { path: "/account", icon: <CircleUserRound /> },
+    { path: "/search", icon: <Search size={30} /> },
+    { path: "/account", icon: <CircleUserRound size={30} /> },
   ];
   return (
     <div className="w-full shadow-[0px_0px_5px_1px_black] rounded-t-3xl ">
