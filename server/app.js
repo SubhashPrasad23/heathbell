@@ -10,7 +10,26 @@ const medicineInfoRouter = require("./src/routes/medicineInfoAiRouter");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+const allowedOrigins = [
+  "http://localhost:5173",          // Frontend local development
+  "capacitor://localhost",          // Capacitor for mobile
+  "http://10.0.2.2:5173",          // Android Emulator
+  "https://localhost:5173",         // If your frontend is served over HTTPS
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
+
+
+// app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

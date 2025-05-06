@@ -39,13 +39,19 @@ const handleLogin = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
       const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-
       res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
+
+      // res.cookie("token", token, {
+      //   httpOnly: true,
+      //   secure: true,
+      //   sameSite: "none",
+      //   maxAge: 7 * 24 * 60 * 60 * 1000,
+      // });
       res.status(200).json({ message: "Login successfully", data: user });
     } else {
       return res.status(404).json("Invalid credentials");
