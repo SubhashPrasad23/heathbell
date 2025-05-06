@@ -16,18 +16,18 @@ const LoginForm = () => {
   };
 
   const dispatch = useDispatch();
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+console.log("lofjijf")
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/auth/login`,
         form,
         { withCredentials: true }
       );
-dispatch(addUser(response.data.data))
+      dispatch(addUser(response.data.data))
       if (response.status === 200) {
         navigate("/");
       }

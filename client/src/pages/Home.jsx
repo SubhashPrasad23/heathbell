@@ -49,7 +49,7 @@ const Home = () => {
   const handlePatientChange = (selectedPatient) => {
     localStorage.setItem("selectedPatientId", selectedPatient._id);
     setIsPatientDialogOpen(false);
-    setSelectedPatientId(selectedPatient._id);
+    setSelectedPatientId(selectedPatient?._id);
     setSelectedPatient(selectedPatient);
   };
 
@@ -87,11 +87,12 @@ const Home = () => {
   }, [userId]);
 
   useEffect(() => {
+    if (!selectedPatientId) return; // 🛑 Prevent broken request
+
     const fetchAllMedicine = async () => {
       try {
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_BASE_URL
+          `${import.meta.env.VITE_BASE_URL
           }/medicine/${selectedPatientId}/getAllMedicine`,
           { withCredentials: true }
         );
@@ -127,8 +128,7 @@ const Home = () => {
 
     try {
       const response = axios.post(
-        `${import.meta.env.VITE_BASE_URL}/medicine/${selectedPatientId}/${
-          editingMedicine?._id
+        `${import.meta.env.VITE_BASE_URL}/medicine/${selectedPatientId}/${editingMedicine?._id
         }/editMedicine`,
         {
           name: formData.name,
@@ -228,22 +228,20 @@ const Home = () => {
                 <motion.button
                   key={patient._id}
                   onClick={() => handlePatientChange(patient)}
-                  className={`flex items-center p-3 rounded-lg transition-all w-full cursor-pointer ${
-                    patient._id == selectedPatientId
+                  className={`flex items-center p-3 rounded-lg transition-all w-full cursor-pointer ${patient._id == selectedPatientId
                       ? "bg-teal-600 shadow-inner shadow-teal-500 text-white"
                       : "hover:bg-gray-200 border border-transparent"
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="ml-3 text-left">
                     <p className="font-medium ">{patient.name}</p>
                     <p
-                      className={`${
-                        patient._id == selectedPatientId
+                      className={`${patient._id == selectedPatientId
                           ? " text-white"
                           : "text-gray-500"
-                      } text-xs `}
+                        } text-xs `}
                     >
                       {patient.age} years • {patient.gender}
                     </p>

@@ -28,7 +28,6 @@ const MedicineCard = ({
       console.log(error);
     }
   };
-  console.log(medicine, "med name");
 
   const item = {
     hidden: { opacity: 0, y: 20 },

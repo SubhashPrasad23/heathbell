@@ -10,7 +10,7 @@ import PatientForm from "./PatientForm";
 import NoFound from "./NoFound";
 import { useNavigate } from "react-router-dom";
 
-const PatientsList = () => {
+const PatientsList = ({ setActiveView }) => {
   const [loading, setLoading] = useState(true);
   const userId = useSelector((store) => store.user?._id);
   const patients = useSelector((store) => store.patient);
@@ -22,7 +22,6 @@ const PatientsList = () => {
     gender: "",
     contact: "",
   });
-  console.log(isEditing, "direct");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const container = {

@@ -15,6 +15,10 @@ const MedicineForm = ({
   selectedDays,
   setSelectedDays,
 }) => {
+
+
+
+  console.log(selectedInstruction)
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
       setSelectedDays(selectedDays.filter((d) => d !== day));
@@ -22,15 +26,43 @@ const MedicineForm = ({
       setSelectedDays([...selectedDays, day]);
     }
   };
+
+
   const toggleInstruction = (instruction) => {
+    if (!formData.frequency) return;
+
+    const frequencyLimits = {
+      "Once a day": 1,
+      "Twice a day": 2,
+      "Three times a day": 3,
+      "Weekly": 1,
+    };
+
+    const limit = frequencyLimits[formData.frequency] || 1;
     if (selectedInstruction.includes(instruction)) {
-      setSelectedInstruction(
-        selectedInstruction.filter((d) => d !== instruction)
-      );
+      setSelectedInstruction(selectedInstruction.filter((d) => d !== instruction));
     } else {
-      setSelectedInstruction([...selectedInstruction, instruction]);
+      if (selectedInstruction.length < limit) {
+        setSelectedInstruction([...selectedInstruction, instruction]);
+      } else {
+
+        alert(`You can only select ${limit} instruction(s) for this frequency.`);
+      }
     }
   };
+
+  // const toggleInstruction = (instruction) => {
+  //   if (!formData.frequency) {
+  //     return;
+  //   }
+  //   if (selectedInstruction.includes(instruction)) {
+  //     setSelectedInstruction(
+  //       selectedInstruction.filter((d) => d !== instruction)
+  //     );
+  //   } else {
+  //     setSelectedInstruction([...selectedInstruction, instruction]);
+  //   }
+  // };
   const handleFrequencyChange = (e) => {
     const selected = e.target.value;
     setFormData({
@@ -48,7 +80,6 @@ const MedicineForm = ({
   };
 
   const handleTimeChange = (index, value) => {
-    console.log(value);
     const updated = [...times];
     updated[index] = value;
     setTimes(updated);
@@ -148,7 +179,7 @@ const MedicineForm = ({
           >
             <div className="space-y-3 ">
               {times.map((time, index) => (
-                <div className="relative w-full">
+                <div key={index} className="relative w-full">
                   <label className="block text-gray-700 font-medium mb-1">
                     Select Time
                   </label>
@@ -172,12 +203,12 @@ const MedicineForm = ({
           {instructionOptions.map((instruction, index) => (
             <div
               key={instruction}
+
               onClick={() => toggleInstruction(instruction)}
-              className={`cursor-pointer text-center rounded-md md:py-2 py-1.5 px-1 transition-all ${
-                selectedInstruction.includes(instruction)
-                  ? "bg-teal-500 text-white font-sm shadow-md"
-                  : "bg-white border border-gray-300  hover:border-teal-500"
-              }`}
+              className={`cursor-pointer text-center rounded-md md:py-2 py-1.5 px-1 transition-all ${selectedInstruction.includes(instruction)
+                ? "bg-teal-500 text-white font-sm shadow-md"
+                : "bg-white border border-gray-300  hover:border-teal-500"
+                }`}
             >
               {instruction}
             </div>
@@ -192,11 +223,10 @@ const MedicineForm = ({
             <div
               key={day}
               onClick={() => toggleDay(day)}
-              className={`cursor-pointer text-center rounded-md md:py-2 py-1.5 px-1 transition-all ${
-                selectedDays.includes(day)
-                  ? "bg-teal-500 text-white font-sm shadow-md"
-                  : "bg-white border border-gray-300  hover:border-teal-500"
-              }`}
+              className={`cursor-pointer text-center rounded-md md:py-2 py-1.5 px-1 transition-all ${selectedDays.includes(day)
+                ? "bg-teal-500 text-white font-sm shadow-md"
+                : "bg-white border border-gray-300  hover:border-teal-500"
+                }`}
             >
               {day.substring(0, 3)}
             </div>
