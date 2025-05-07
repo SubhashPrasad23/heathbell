@@ -62,4 +62,13 @@ const handleLogin = async (req, res) => {
   }
 };
 
-module.exports = { handleSignUp, handleLogin };
+const handleLogout =  async (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.send("logout succesfully");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { handleSignUp, handleLogin, handleLogout };
