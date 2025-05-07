@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pill, Calendar } from "lucide-react";
 
@@ -14,11 +13,11 @@ const MedicineForm = ({
   setSelectedInstruction,
   selectedDays,
   setSelectedDays,
+  errors
 }) => {
 
+  console.log(errors)
 
-
-  console.log(selectedInstruction)
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
       setSelectedDays(selectedDays.filter((d) => d !== day));
@@ -51,30 +50,19 @@ const MedicineForm = ({
     }
   };
 
-  // const toggleInstruction = (instruction) => {
-  //   if (!formData.frequency) {
-  //     return;
-  //   }
-  //   if (selectedInstruction.includes(instruction)) {
-  //     setSelectedInstruction(
-  //       selectedInstruction.filter((d) => d !== instruction)
-  //     );
-  //   } else {
-  //     setSelectedInstruction([...selectedInstruction, instruction]);
-  //   }
-  // };
-  const handleFrequencyChange = (e) => {
-    const selected = e.target.value;
+
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      frequency: selected,
+      [name]: value,
     });
 
     let count = 0;
-    if (selected === "Once a day") count = 1;
-    else if (selected === "Twice a day") count = 2;
-    else if (selected === "Three times a day") count = 3;
-    else if (selected === "Weekly") count = 1;
+    if (value === "Once a day") count = 1;
+    else if (value === "Twice a day") count = 2;
+    else if (value === "Three times a day") count = 3;
+    else if (value === "Weekly") count = 1;
 
     setTimes(Array(count).fill(""));
   };
@@ -119,23 +107,43 @@ const MedicineForm = ({
           onChange={handleInputChange}
           className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500"
           placeholder="Enter medicine name"
-          required
         />
+
+
+        {errors.name && <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="text-red-500 text-sm mt-1"
+        >{errors.name}</motion.p>}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="  ">
-          <label className="block  font-medium mb-2">Type of Medicine*</label>
-          <input
-            type="text"
-            name="typeofMedicine"
-            value={formData.typeofMedicine}
-            onChange={handleInputChange}
-            placeholder="e.g., Tablet, Syrup"
+      <div className="grid grid-cols-2 gap-4">
+
+        <div className="">
+          <label className="block  font-medium mb-2 ">Type of Medicine</label>
+          <select
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500"
-            required
-          />
+            value={formData.typeOfMedicine}
+            onChange={handleSelectChange}
+            name="typeOfMedicine"
+          >
+            <option value="" disabled>
+              Select Type of Medicine
+            </option>
+            <option value="Tablet">Tablet</option>
+            <option value="Capsule">Capsule</option>
+            <option value="Syrup">Syrup</option>
+            <option value="Cream">Cream</option>
+            <option value="Gel">Gel</option>
+            <option value="Powder">Powder</option>
+            <option value="Drops">Drops</option>
+            <option value="Inhaler">Inhaler</option>
+
+          </select>
+
         </div>
+
         <div className="">
           <label className="block font-medium mb-2">Dosage*</label>
           <input
@@ -145,8 +153,14 @@ const MedicineForm = ({
             onChange={handleInputChange}
             placeholder="e.g., 2 tablets, 5ml"
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500"
-            required
+
           />
+          {errors.dosage && <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-red-500 text-sm mt-1"
+          >{errors.dosage}</motion.p>}
         </div>
       </div>
 
@@ -155,9 +169,8 @@ const MedicineForm = ({
         <select
           className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500"
           value={formData.frequency}
-          onChange={handleFrequencyChange}
+          onChange={handleSelectChange}
           name="frequency"
-          required
         >
           <option value="" disabled>
             Select frequency
@@ -167,6 +180,12 @@ const MedicineForm = ({
           <option value="Three times a day">Three times a day</option>
           <option value="Weekly">Once a week</option>
         </select>
+        {errors.frequency && <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="text-red-500 text-sm mt-1"
+        >{errors.frequency}</motion.p>}
       </div>
 
       <AnimatePresence>
@@ -193,8 +212,15 @@ const MedicineForm = ({
                 </div>
               ))}
             </div>
+            {errors.times && <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-red-500 text-sm mt-1"
+            >{errors.times}</motion.p>}
           </motion.div>
         )}
+
       </AnimatePresence>
 
       <div className="">
@@ -214,6 +240,12 @@ const MedicineForm = ({
             </div>
           ))}
         </div>
+        {errors.selectedInstruction && <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="text-red-500 text-sm mt-1"
+        >{errors.selectedInstruction}</motion.p>}
       </div>
 
       <div className="">
@@ -232,11 +264,17 @@ const MedicineForm = ({
             </div>
           ))}
         </div>
+        {errors.selectedDays && <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="text-red-500 text-sm mt-1"
+        >{errors.selectedDays}</motion.p>}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 gap-4">
         <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-100">
-          <label className="block text-cyan-800 font-medium mb-2 flex items-center">
+          <label className=" text-cyan-800 font-medium mb-2 flex items-center">
             <Calendar size={18} className="mr-2" />
             Start Date*
           </label>
@@ -246,12 +284,19 @@ const MedicineForm = ({
             value={formData.startDate}
             onChange={handleInputChange}
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-            required
+            min={new Date().toISOString().split("T")[0]}
+
           />
+          {errors.startDate && <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-red-500 text-sm mt-1"
+          >{errors.startDate}</motion.p>}
         </div>
 
         <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-100">
-          <label className="block text-cyan-800 font-medium mb-2 flex items-center">
+          <label className=" text-cyan-800 font-medium mb-2 flex items-center">
             <Calendar size={18} className="mr-2" />
             End Date
           </label>
@@ -261,7 +306,14 @@ const MedicineForm = ({
             value={formData.endDate}
             onChange={handleInputChange}
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+            min={formData.startDate}
           />
+          {errors.endDate && <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-red-500 text-sm mt-1"
+          >{errors.endDate}</motion.p>}
         </div>
       </div>
 

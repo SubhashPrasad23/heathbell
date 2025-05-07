@@ -20,6 +20,64 @@ const AddMedicine = () => {
   const [times, setTimes] = useState([]);
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectedInstruction, setSelectedInstruction] = useState([]);
+  const [errors, setErrors] = useState({ name: "", typeofMedicine: "", dosage: "", frequency: "", startDate: "", endDate: "", times: "", selectedDays: "", selectedInstruction: "" });
+
+
+  const validateForm = () => {
+
+    let isValid = true
+    const newErrors = { name: "", dosage: "", frequency: "", startDate: "", endDate: "", times: "", selectedDays: "", selectedInstruction: "" }
+
+
+    if (!formData.name) {
+      newErrors.name = "Name is required"
+      isValid = false
+    }
+
+
+
+    if (!formData.dosage) {
+      newErrors.dosage = "Dosage is required"
+      isValid = false
+    }
+
+
+    if (!formData.frequency) {
+      newErrors.frequency = "Frequency is required"
+      isValid = false
+    }
+
+    if (!formData.startDate) {
+      newErrors.startDate = "Start Date is required"
+      isValid = false
+    }
+
+
+    if (!formData.endDate) {
+      newErrors.endDate = "End Date  is required"
+      isValid = false
+    }
+
+    if (!times || times.length === 0 || times.some(t => !t)) {
+      newErrors.times = "All time fields are required";
+      isValid = false;
+    }
+
+    if (!selectedDays.length > 0) {
+      newErrors.selectedDays = "Day is required"
+      isValid = false
+    }
+
+    if (!selectedInstruction.length > 0) {
+      newErrors.selectedInstruction = "Instruction is required"
+      isValid = false
+    }
+    setErrors(newErrors)
+    return isValid
+  }
+
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +91,11 @@ const AddMedicine = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/medicine/${selectedId}/addmedicines`,
@@ -90,6 +153,7 @@ const AddMedicine = () => {
         setSelectedDays={setSelectedDays}
         selectedInstruction={selectedInstruction}
         setSelectedInstruction={setSelectedInstruction}
+        errors={errors}
       />
 
       <AnimatePresence>
@@ -98,7 +162,7 @@ const AddMedicine = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.4 }} // 0.5 seconds
+            transition={{ duration: 0.4 }}
             className="fixed inset-0  flex items-center justify-center  p-4 z-50"
           >
             <SuccessPopup message="added medicine" />
