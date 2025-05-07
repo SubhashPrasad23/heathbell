@@ -87,7 +87,7 @@ const Home = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (!selectedPatientId) return; // 🛑 Prevent broken request
+    if (!selectedPatientId) return; 
 
     const fetchAllMedicine = async () => {
       try {

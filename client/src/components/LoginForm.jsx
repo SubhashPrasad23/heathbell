@@ -13,6 +13,7 @@ const LoginForm = () => {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
 
+  const dispatch = useDispatch();
 
   const validateForm = () => {
     let isValid = true
@@ -40,7 +41,6 @@ const LoginForm = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const dispatch = useDispatch();
 
 
   const handleSubmit = async (e) => {

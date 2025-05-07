@@ -97,9 +97,9 @@ const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
       isLogout: true,
     },
   ];
-  const handleLogout = () => {
-    axios.post(`${import.meta.env.VITE_API_BASE_URL}/logout`, {}, { withCredentials: true });
-    navigate("/login");
+  const handleLogout = async () => {
+    await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/logout`, {}, { withCredentials: true });
+    navigate("/auth");
   };
 
 
