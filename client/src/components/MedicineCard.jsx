@@ -103,7 +103,7 @@ const MedicineCard = ({
           </div>
         </div>
         <div className="mb-3">
-          <p className="text-gray-700 font-medium">Instructions:</p>
+          <p className="text-gray-700 font-medium">Scheduled Days :</p>
           <div className="flex flex-wrap gap-2 mt-1">
             {medicine?.daysOfWeek?.map((day, index) => (
               <span

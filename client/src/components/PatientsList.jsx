@@ -22,9 +22,10 @@ const PatientsList = ({ setActiveView }) => {
     gender: "",
     contact: "",
   }); const [errors, setErrors] = useState({});
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -142,7 +143,6 @@ const PatientsList = ({ setActiveView }) => {
           }
         );
         dispatch(addPatient(response?.data?.data));
-        console.log(response);
       } catch (error) {
         console.log(error);
       } finally {
@@ -163,8 +163,7 @@ const PatientsList = ({ setActiveView }) => {
     }
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/patient/${userId}/${
-          editingPatient._id
+        `${import.meta.env.VITE_BASE_URL}/patient/${userId}/${editingPatient._id
         }/editPatient`,
         formData,
         { withCredentials: true }
@@ -207,59 +206,60 @@ const PatientsList = ({ setActiveView }) => {
       </div>
 
       <div className="h-full overflow-auto hideScrollbar">
-          {!isEditing ? (
+        {!isEditing ? (
+          <motion.div
+            key="patientList"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={slideIn}
+            className="h-full flex flex-col overflow-auto hideScrollbar"
+          >
             <motion.div
-              key="patientList"
+              variants={container}
               initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={slideIn}
-              className="h-full flex flex-col overflow-auto hideScrollbar"
+              animate="show"
+              className="h-full space-y-2 "
             >
-              <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="h-full space-y-2 "
-              >
-                {loading ? (
-                  <Loading />
-                ) : patients.length > 0 ? (
-                  patients.map((patient, index) => (
-                    <div key={patient._id}>
-                      <PatientCard
-                        patient={patient}
-                        setFormData={setFormData}
-                        setEditingPatient={setEditingPatient}
-                        setIsEditing={setIsEditing}
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <NoFound setActiveView={setActiveView} />
-                )}
-              </motion.div>
+              {loading ? (
+                <Loading />
+              ) : patients.length > 0 ? (
+                patients.map((patient) => (
+                  <div key={patient._id}>
+                    <PatientCard
+                      patient={patient}
+                      setFormData={setFormData}
+                      setEditingPatient={setEditingPatient}
+                      setIsEditing={setIsEditing}
+                      patients={patients}
+                    />
+                  </div>
+                ))
+              ) : (
+                    <NoFound buttonText="Add Patient" message="No Patients Found" description="You haven't added any patients yet. Click the  Add Patient button to get started." onClose={() => navigate("/account/add-patient")}  />
+              )}
             </motion.div>
-          ) : (
-            <motion.div
-              key="editForm"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={editSlideIn}
-              className=" h-full flex flex-col "
-            >
-              <div className="">
-                <PatientForm
-                  handleSave={handleSave}
-                  formData={formData}
-                  setFormData={setFormData}
-                  errors={errors}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="editForm"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={editSlideIn}
+            className=" h-full flex flex-col "
+          >
+            <div className="">
+              <PatientForm
+                handleSave={handleSave}
+                formData={formData}
+                setFormData={setFormData}
+                errors={errors}
 
-                />
-              </div>
-            </motion.div>
-          )}
+              />
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

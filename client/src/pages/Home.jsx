@@ -10,6 +10,7 @@ import MedicineCard from "../components/MedicineCard";
 import { addPatient } from "../features/patient/patientSlice";
 import MedicineForm from "../components/MedicineForm";
 import SuccessPopup from "../components/SuccessPopup";
+import NoFound from "../components/NoFound";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -394,40 +395,8 @@ const Home = () => {
               </div>
             ))
           ) : (
-            <motion.div
-              variants={container}
-              initial="hidden"
-              animate="show"
-              className="flex h-full flex-1 items-center justify-center "
-            >
-              <motion.div
-                variants={item}
-                className="p-6 max-w-md w-full text-center "
-              >
-                <div className="flex justify-center mb-4">
-                  <div className="bg-amber-100 p-4 rounded-full">
-                    <Pill className="h-10 w-10 text-amber-500" />
-                  </div>
-                </div>
 
-                <p className="text-gray-600 text-xl font-bold font-MontSerrat">
-                  No medicines have been added yet.
-                </p>
-
-                <p className="text-sm text-gray-600">
-                  Set up medication schedules to get timely reminders.
-                </p>
-
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => navigate("add_medicine")}
-                  className="mt-5 w-full py-3 px-4 bg-teal-600 text-white rounded-lg flex items-center justify-center font-medium hover:bg-teal-700 transition-colors cursor-pointer"
-                >
-                  Add Medicine
-                </motion.button>
-              </motion.div>
-            </motion.div>
+            <NoFound buttonText="Add Medicine" message="No Medicines Added" description="No medicines are currently scheduled. Add a medicine to start tracking reminders." onClose={() => navigate("add_medicine")} />
           )}
         </motion.div>
       )}

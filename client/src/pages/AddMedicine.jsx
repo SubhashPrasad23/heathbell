@@ -22,7 +22,6 @@ const AddMedicine = () => {
   const [selectedInstruction, setSelectedInstruction] = useState([]);
   const [errors, setErrors] = useState({ name: "", typeofMedicine: "", dosage: "", frequency: "", startDate: "", endDate: "", times: "", selectedDays: "", selectedInstruction: "" });
 
-console.log(formData,"add")
   const validateForm = () => {
 
     let isValid = true

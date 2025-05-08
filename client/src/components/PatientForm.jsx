@@ -1,10 +1,9 @@
 import React from "react";
 import Input from "./Input";
-import { motion,  } from "framer-motion";
+import { motion, } from "framer-motion";
 
 
-const PatientForm = ({ handleSave, formData, setFormData,errors }) => {
-console.log(handleSave,"save")
+const PatientForm = ({ handleSave, formData, setFormData, errors }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -44,7 +43,7 @@ console.log(handleSave,"save")
             name="gender"
             value={formData.gender}
             onChange={handleInputChange}
-            className="bg-white w-full p-2 border border-gray-300 rounded-md focus:border-2  focus:border-teal-500 focus:outline-none"
+            className="bg-white w-full p-3 border border-gray-300 rounded-md focus:border-2  focus:border-teal-500 focus:outline-none"
           >
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
@@ -72,7 +71,7 @@ console.log(handleSave,"save")
         />
         <button
           type="submit"
-          className="w-full  p-1.5 text-lg mt-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 cursor-pointer"
+          className=" w-full px-6 py-3 cursor-pointer bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 font-medium shadow-md hover:shadow-lg transition-all flex items-center justify-center"
         >
           Save
         </button>

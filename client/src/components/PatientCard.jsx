@@ -12,8 +12,9 @@ const PatientCard = ({
   setIsEditing,
 }) => {
   const dispatch = useDispatch();
-
   const userId = useSelector((store) => store.user?._id);
+  const medicines = useSelector((store) => store.medicine);
+
 
   const handleEditClick = (patient) => {
     setIsEditing(true);
@@ -27,6 +28,12 @@ const PatientCard = ({
   };
 
   const deleteHandler = async (patientId) => {
+
+    if (medicines && medicines.length > 0) {
+      alert("Cannot delete patient. Please make sure all medicines are removed before deleting the patient.");
+      return;
+    }
+
     try {
       const response = await axios.post(
         `${

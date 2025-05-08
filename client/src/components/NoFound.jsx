@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const NoFound = ({ setActiveView }) => {
+const NoFound = ({ message, onClose, description,buttonText }) => {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -25,20 +25,20 @@ const NoFound = ({ setActiveView }) => {
     >
       <motion.div variants={item} className="p-6 max-w-md w-full text-center">
         <p className="text-gray-600 md:text-xl  font-semibold">
-          No Patient have been added yet.
+          {message}
         </p>
 
         <p className="text-sm text-gray-600">
-          Set up medication schedules to get timely reminders.
+         {description}
         </p>
 
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => setActiveView("addPatient")}
+          onClick={onClose}
           className="mt-5 w-full py-3 px-4 bg-teal-600 text-white rounded-lg flex items-center justify-center font-medium hover:bg-teal-700 transition-colors cursor-pointer"
         >
-          Add Patient
+          {buttonText}
         </motion.button>
       </motion.div>
     </motion.div>

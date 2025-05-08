@@ -18,12 +18,21 @@ const MedicineForm = ({
 
 
   const toggleDay = (day) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter((d) => d !== day));
+    if (formData.frequency === "Weekly") {
+      if (selectedDays.includes(day)) {
+        setSelectedDays([]);
+      } else {
+        setSelectedDays([day]);
+      }
     } else {
-      setSelectedDays([...selectedDays, day]);
+      if (selectedDays.includes(day)) {
+        setSelectedDays(selectedDays.filter((d) => d !== day));
+      } else {
+        setSelectedDays([...selectedDays, day]);
+      }
     }
   };
+
 
 
   const toggleInstruction = (instruction) => {
@@ -318,16 +327,15 @@ const MedicineForm = ({
 
       <div className="">
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+       
           type="submit"
           className=" w-full px-6 py-3 cursor-pointer bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 font-medium shadow-md hover:shadow-lg transition-all flex items-center justify-center"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <div className="flex items-center">Saving...</div>
+           "Saving..."
           ) : (
-            <>Save</>
+          "  Save"
           )}
         </motion.button>
       </div>

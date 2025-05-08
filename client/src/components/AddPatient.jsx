@@ -14,7 +14,6 @@ const AddPatient = () => {
     gender: "",
     contact: "",
   });
-
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,9 +108,9 @@ const AddPatient = () => {
       animate="visible"
       exit="exit"
       variants={slideIn}
-      className="h-full flex flex-col"
+      className="h-full flex flex-col hideScrollbar"
     >
-      <div className="flex items-center mb-6">
+      <div className="flex items-center mb-6 hideScrollbar">
         <button
           onClick={() => navigate("/account")}
           className="p-2 mr-3 rounded-full bg-teal-50 text-teal-600 hover:bg-teal-100 cursor-pointer"
@@ -121,7 +120,7 @@ const AddPatient = () => {
         <h2 className="text-xl font-bold text-teal-700">Add New Patient</h2>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto hideScrollbar">
         <PatientForm
           formData={formData}
           setFormData={setFormData}
@@ -144,7 +143,7 @@ const AddPatient = () => {
               message="Patient added successfully"
               onClose={() => {
                 setShowSuccess(false);
-                navigate("/account"); // Optional redirect
+                navigate("/account");
               }}
             />
           </motion.div>

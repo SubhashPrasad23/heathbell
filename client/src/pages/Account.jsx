@@ -126,10 +126,9 @@ const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
               if (option.isLogout) {
                 handleLogout();
               } else {
-                navigate(option.path);  // programmatic navigation
+                navigate(option.path); 
               }
             }}
-            // onClick={() => setActiveView(option.id)}
             className={`w-full bg-white shadow-inner border border-gray-300 shadow-gray-200 rounded-lg overflow-hidden cursor-pointer`}
           >
             <div className="p-5 flex items-center justify-between">
