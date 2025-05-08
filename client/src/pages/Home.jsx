@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pill, ArrowLeft } from "lucide-react";
 import axios from "axios";
-import { addMedicine } from "../features/medicine/medicine";
+import { addMedicine, updateMedicine } from "../features/medicine/medicine";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
@@ -35,8 +35,76 @@ const Home = () => {
   const [editingMedicine, setEditingMedicine] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [errors, setErrors] = useState({
+    name: "",
+    dosage: "",
+    frequency: "",
+    startDate: "",
+    endDate: "",
+    times: "",
+    selectedDays: "",
+    selectedInstruction: ""
+  });
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      name: "",
+      dosage: "",
+      frequency: "",
+      startDate: "",
+      endDate: "",
+      times: "",
+      selectedDays: "",
+      selectedInstruction: ""
+    };
+
+    if (!formData.name) {
+      newErrors.name = "Name is required";
+      isValid = false;
+    }
+
+    if (!formData.dosage) {
+      newErrors.dosage = "Dosage is required";
+      isValid = false;
+    }
+
+    if (!formData.frequency) {
+      newErrors.frequency = "Frequency is required";
+      isValid = false;
+    }
+
+    if (!formData.startDate) {
+      newErrors.startDate = "Start date is required";
+      isValid = false;
+    }
+
+    if (!formData.endDate) {
+      newErrors.endDate = "End date is required";
+      isValid = false;
+    }
+
+    if (!times || times.length === 0 || times.some(t => !t)) {
+      newErrors.times = "Time is required";
+      isValid = false;
+    }
+
+    if (!selectedDays || selectedDays.length === 0) {
+      newErrors.selectedDays = "Select at least one day";
+      isValid = false;
+    }
+
+    if (!selectedInstruction || selectedInstruction.length === 0) {
+      newErrors.selectedInstruction = "Instruction is required";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +155,7 @@ const Home = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (!selectedPatientId) return; 
+    if (!selectedPatientId) return;
 
     const fetchAllMedicine = async () => {
       try {
@@ -125,7 +193,10 @@ const Home = () => {
     e.preventDefault();
 
     setIsSubmitting(true);
-
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
     try {
       const response = axios.post(
         `${import.meta.env.VITE_BASE_URL}/medicine/${selectedPatientId}/${editingMedicine?._id
@@ -143,7 +214,21 @@ const Home = () => {
         },
         { withCredentials: true }
       );
-
+      dispatch(updateMedicine({
+        id: editingMedicine?._id,
+        updatedData: {
+          name: formData.name,
+          typeofMedicine: formData.typeofMedicine,
+          dosage: formData.dosage,
+          frequency: formData.frequency,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          times: times,
+          daysOfWeek: selectedDays,
+          instructions: selectedInstruction,
+        },
+      })
+      );
       setFormData({
         name: "",
         typeofMedicine: "",
@@ -246,9 +331,7 @@ const Home = () => {
                       {patient.age} years • {patient.gender}
                     </p>
                   </div>
-                  {/* {p.id === patient?.id && (
-                    <CheckCircle className="ml-auto h-5 w-5 text-emerald-500" />
-                  )} */}
+
                 </motion.button>
               ))}
             </div>
@@ -270,6 +353,8 @@ const Home = () => {
             setSelectedDays={setSelectedDays}
             selectedInstruction={selectedInstruction}
             setSelectedInstruction={setSelectedInstruction}
+            errors={errors}
+
           />
           <AnimatePresence>
             {showSuccess && (
@@ -280,7 +365,10 @@ const Home = () => {
                 transition={{ duration: 0.4 }} // 0.5 seconds
                 className="fixed inset-0  flex items-center justify-center  p-4 z-50"
               >
-                <SuccessPopup message="updated medicine" />
+                <SuccessPopup message="updated medicine" onClose={() => {
+                  setShowSuccess(false)
+                  setIsEditing(false)
+                }} />
               </motion.div>
             )}
           </AnimatePresence>

@@ -6,6 +6,7 @@ import PatientsList from "../components/PatientsList";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { capitalizeFirstLetter } from "../utils/helper/helper";
 
 const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
   const [formData, setFormData] = useState({
@@ -111,7 +112,7 @@ const Account = ({ patients, selectedPatient, setSelectedPatient }) => {
             <UserCircle size={32} />
           </div>
           <div>
-            <h3 className="font-semibold md:text-lg">{user?.fullName}</h3>
+            <h3 className="font-semibold md:text-lg">{capitalizeFirstLetter(user?.fullName)}</h3>
             <p className="text-gray-500 ">{user?.email}</p>
           </div>
         </div>

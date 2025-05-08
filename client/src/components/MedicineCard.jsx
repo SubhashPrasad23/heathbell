@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { removeMedicine } from "../features/medicine/medicine";
 import { useDispatch } from "react-redux";
+import { capitalizeFirstLetter, formatDateToDDMMYYYY, formatTo12Hour } from "../utils/helper/helper";
 
 const MedicineCard = ({
   medicine,
@@ -17,8 +18,7 @@ const MedicineCard = ({
   const handleDeleteMedicine = async (medicineId) => {
     try {
       const response = await axios.post(
-        `${
-          import.meta.env.VITE_BASE_URL
+        `${import.meta.env.VITE_BASE_URL
         }/medicine/${storedId}/${medicineId}/deleteMedicine`,
         {},
         { withCredentials: true }
@@ -38,10 +38,10 @@ const MedicineCard = ({
     setIsEditing(true);
     setEditingMedicine(medicine);
     setFormData({
-      name: medicine.name,
-      typeofMedicine: medicine.typeofMedicine,
-      dosage: medicine.dosage,
-      frequency: medicine.frequency,
+      name: medicine?.name,
+      typeofMedicine: medicine?.typeofMedicine,
+      dosage: medicine?.dosage,
+      frequency: "",
       startDate: "",
       endDate: "",
     });
@@ -55,7 +55,7 @@ const MedicineCard = ({
     >
       <div className="bg-teal-600 p-3 text-white flex items-start justify-between">
         <div>
-          <h3 className="font-bold text-lg">{medicine.name}</h3>
+          <h3 className="font-bold text-lg">{capitalizeFirstLetter(medicine.name)}</h3>
           <p className="text-teal-100 text-sm">{medicine.dosage}</p>
         </div>
         <div className="flex justify-end gap-2">
@@ -83,7 +83,7 @@ const MedicineCard = ({
                 key={index}
                 className="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs"
               >
-                {time}
+                {formatTo12Hour(time)}
               </span>
             ))}
           </div>
@@ -102,6 +102,39 @@ const MedicineCard = ({
             ))}
           </div>
         </div>
+        <div className="mb-3">
+          <p className="text-gray-700 font-medium">Instructions:</p>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {medicine?.daysOfWeek?.map((day, index) => (
+              <span
+                key={index}
+                className="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs"
+              >
+                {day}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="mb-4">
+          <p className="text-sm font-semibold text-gray-600 mb-2">Medication Period</p>
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col items-start">
+              <span className="text-xs text-gray-500">Start Date</span>
+              <span className="text-sm font-medium text-teal-700">
+                {formatDateToDDMMYYYY(medicine.startDate)}
+              </span>
+            </div>
+            <div className="text-gray-400 font-semibold text-sm">→</div>
+            <div className="flex flex-col items-end">
+              <span className="text-xs text-gray-500">End Date</span>
+              <span className="text-sm font-medium text-teal-700">
+                {formatDateToDDMMYYYY(medicine.endDate)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      
       </div>
     </motion.div>
   );

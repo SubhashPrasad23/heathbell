@@ -12,13 +12,13 @@ const medicineSlice = createSlice({
     },
     updateMedicine: (state, action) => {
       const { id, updatedData } = action.payload;
-      return state.map((patient) =>
-        patient._id === id ? { ...patient, ...updatedData } : patient
+      return state.map((medicine) =>
+        medicine._id === id ? { ...medicine, ...updatedData } : medicine
       );
     },
   },
 });
 
-export const { addMedicine, removeMedicine,updateMedicine } = medicineSlice.actions;
+export const { addMedicine, removeMedicine, updateMedicine } = medicineSlice.actions;
 
 export default medicineSlice.reducer;

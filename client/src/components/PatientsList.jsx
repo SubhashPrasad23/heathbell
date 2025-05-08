@@ -21,7 +21,8 @@ const PatientsList = ({ setActiveView }) => {
     age: "",
     gender: "",
     contact: "",
-  });
+  }); const [errors, setErrors] = useState({});
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const container = {
@@ -33,7 +34,39 @@ const PatientsList = ({ setActiveView }) => {
       },
     },
   };
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
 
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+      isValid = false;
+    }
+
+    if (!formData.age) {
+      newErrors.age = "Age is required";
+      isValid = false;
+    } else if (isNaN(formData.age) || +formData.age <= 0) {
+      newErrors.age = "Valid age is required";
+      isValid = false;
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = "Gender is required";
+      isValid = false;
+    }
+
+    if (!formData.contact.trim()) {
+      newErrors.contact = "Contact is required";
+      isValid = false;
+    } else if (!/^[0-9]{10}$/.test(formData.contact)) {
+      newErrors.contact = "Contact must be 10 digits";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
@@ -124,6 +157,10 @@ const PatientsList = ({ setActiveView }) => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/patient/${userId}/${
@@ -217,6 +254,8 @@ const PatientsList = ({ setActiveView }) => {
                   handleSave={handleSave}
                   formData={formData}
                   setFormData={setFormData}
+                  errors={errors}
+
                 />
               </div>
             </motion.div>

@@ -3,6 +3,7 @@ import { removePatient } from "../features/patient/patientSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Edit, Trash2 } from "lucide-react";
 import axios from "axios";
+import { capitalizeFirstLetter } from "../utils/helper/helper";
 
 const PatientCard = ({
   patient,
@@ -46,7 +47,7 @@ const PatientCard = ({
       className={`bg-white shadow-inner border border-gray-300 shadow-gray-200 p-3 rounded-lg  `}
     >
       <div className="flex items-center justify-between">
-        <h4 className="font-semibold tracking-wide">{patient.name}</h4>
+        <h4 className="font-semibold tracking-wide">{capitalizeFirstLetter(patient.name)}</h4>
         <div className="space-x-1">
           <button
             className="p-2 rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200 cursor-pointer"

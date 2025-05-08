@@ -40,7 +40,7 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
     await cancelAllNotifications();
 
     const notifications = [];
-    let notificationId = 1; 
+    let notificationId = 1000; 
 
     const weekDaysMap = {
         "Sunday": 0,

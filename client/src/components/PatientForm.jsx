@@ -1,7 +1,9 @@
 import React from "react";
 import Input from "./Input";
+import { motion,  } from "framer-motion";
 
-const PatientForm = ({ handleSave, formData, setFormData }) => {
+
+const PatientForm = ({ handleSave, formData, setFormData,errors }) => {
 console.log(handleSave,"save")
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +22,7 @@ console.log(handleSave,"save")
           onChange={handleInputChange}
           value={formData.name}
           bgColor="bg-white"
+          error={errors?.name}
         />
 
         <Input
@@ -29,6 +32,8 @@ console.log(handleSave,"save")
           onChange={handleInputChange}
           value={formData.age}
           bgColor="bg-white"
+          error={errors?.age}
+
         />
 
         <div>
@@ -46,6 +51,13 @@ console.log(handleSave,"save")
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
+
+          {errors?.gender && <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-red-500 text-sm mt-1"
+          >{errors?.gender}</motion.p>}
         </div>
 
         <Input
@@ -56,6 +68,7 @@ console.log(handleSave,"save")
           onChange={handleInputChange}
 
           bgColor="bg-white"
+          error={errors?.contact}
         />
         <button
           type="submit"

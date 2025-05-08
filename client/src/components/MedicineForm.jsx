@@ -16,7 +16,6 @@ const MedicineForm = ({
   errors
 }) => {
 
-  console.log(errors)
 
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
@@ -110,12 +109,12 @@ const MedicineForm = ({
         />
 
 
-        {errors.name && <motion.p
+        {errors?.name && <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className="text-red-500 text-sm mt-1"
-        >{errors.name}</motion.p>}
+        >{errors?.name}</motion.p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -124,12 +123,12 @@ const MedicineForm = ({
           <label className="block  font-medium mb-2 ">Type of Medicine</label>
           <select
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500"
-            value={formData.typeOfMedicine}
+            value={formData.typeofMedicine}
             onChange={handleSelectChange}
-            name="typeOfMedicine"
+            name="typeofMedicine"
           >
             <option value="" disabled>
-              Select Type of Medicine
+              Type of Medicine
             </option>
             <option value="Tablet">Tablet</option>
             <option value="Capsule">Capsule</option>
@@ -155,12 +154,12 @@ const MedicineForm = ({
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-teal-500"
 
           />
-          {errors.dosage && <motion.p
+          {errors?.dosage && <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="text-red-500 text-sm mt-1"
-          >{errors.dosage}</motion.p>}
+          >{errors?.dosage}</motion.p>}
         </div>
       </div>
 
@@ -180,12 +179,12 @@ const MedicineForm = ({
           <option value="Three times a day">Three times a day</option>
           <option value="Weekly">Once a week</option>
         </select>
-        {errors.frequency && <motion.p
+        {errors?.frequency && <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className="text-red-500 text-sm mt-1"
-        >{errors.frequency}</motion.p>}
+        >{errors?.frequency}</motion.p>}
       </div>
 
       <AnimatePresence>
@@ -200,7 +199,7 @@ const MedicineForm = ({
               {times.map((time, index) => (
                 <div key={index} className="relative w-full">
                   <label className="block text-gray-700 font-medium mb-1">
-                    Select Time
+                    Select Time*
                   </label>
                   <input
                     type="time"
@@ -212,19 +211,19 @@ const MedicineForm = ({
                 </div>
               ))}
             </div>
-            {errors.times && <motion.p
+            {errors?.times && <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="text-red-500 text-sm mt-1"
-            >{errors.times}</motion.p>}
+            >{errors?.times}</motion.p>}
           </motion.div>
         )}
 
       </AnimatePresence>
 
       <div className="">
-        <label className="block font-medium mb-2 ">Instructions</label>
+        <label className="block font-medium mb-2 ">Instructions*</label>
         <div className="grid grid-cols-2 gap-1">
           {instructionOptions.map((instruction, index) => (
             <div
@@ -240,16 +239,16 @@ const MedicineForm = ({
             </div>
           ))}
         </div>
-        {errors.selectedInstruction && <motion.p
+        {errors?.selectedInstruction && <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className="text-red-500 text-sm mt-1"
-        >{errors.selectedInstruction}</motion.p>}
+        >{errors?.selectedInstruction}</motion.p>}
       </div>
 
       <div className="">
-        <label className="block  font-medium mb-3 ">Days of Week</label>
+        <label className="block  font-medium mb-3 ">Days of Week*</label>
         <div className="grid grid-cols-7 gap-1">
           {daysOfWeek.map((day, index) => (
             <div
@@ -264,12 +263,12 @@ const MedicineForm = ({
             </div>
           ))}
         </div>
-        {errors.selectedDays && <motion.p
+        {errors?.selectedDays && <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className="text-red-500 text-sm mt-1"
-        >{errors.selectedDays}</motion.p>}
+        >{errors?.selectedDays}</motion.p>}
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
@@ -287,18 +286,18 @@ const MedicineForm = ({
             min={new Date().toISOString().split("T")[0]}
 
           />
-          {errors.startDate && <motion.p
+          {errors?.startDate && <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="text-red-500 text-sm mt-1"
-          >{errors.startDate}</motion.p>}
+          >{errors?.startDate}</motion.p>}
         </div>
 
         <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-100">
           <label className=" text-cyan-800 font-medium mb-2 flex items-center">
             <Calendar size={18} className="mr-2" />
-            End Date
+            End Date*
           </label>
           <input
             type="date"
@@ -308,12 +307,12 @@ const MedicineForm = ({
             className="bg-white w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
             min={formData.startDate}
           />
-          {errors.endDate && <motion.p
+          {errors?.endDate && <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="text-red-500 text-sm mt-1"
-          >{errors.endDate}</motion.p>}
+          >{errors?.endDate}</motion.p>}
         </div>
       </div>
 
