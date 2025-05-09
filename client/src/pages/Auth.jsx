@@ -9,7 +9,7 @@ const Auth = () => {
 
   const tabs = [
     { name: "Signup", component: <SignupForm /> },
-    { name: "Login", component: <LoginForm /> },
+    { name: "Login", component: <LoginForm  /> },
   ]
 
   return (
@@ -33,7 +33,7 @@ const Auth = () => {
           ))}
         </div>
 
-        <div className="relative min-h-[500px]  flex items-center justify-center">
+        <div className=" min-h-[510px] flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
@@ -41,7 +41,7 @@ const Auth = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: activeIndex === 0 ? 20 : -20 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0  flex items-center justify-center w-full"
+              className="  flex items-center justify-center w-full"
             >
               {tabs[activeIndex].component}
             </motion.div>

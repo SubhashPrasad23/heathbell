@@ -11,11 +11,13 @@ import { Provider } from "react-redux";
 import { store } from "./store/store.js";
 import PatientsList from "./components/PatientsList.jsx";
 import AddPatient from "./components/AddPatient.jsx";
+import { AuthProvider } from "./context/authContext.jsx";
+import PrivateRoute from "./components/PrivateRoute.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <PrivateRoute> <App /></PrivateRoute>,
     children: [
       { path: "/", element: <Home /> },
       { path: "add_medicine", element: <AddMedicine /> },
@@ -39,6 +41,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+
+    </AuthProvider>
   </Provider>
 );

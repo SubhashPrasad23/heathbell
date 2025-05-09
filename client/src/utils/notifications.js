@@ -37,10 +37,14 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
         lights: true
     });
 
-    await cancelAllNotifications();
+    try {
+        await cancelAllNotifications();
+    } catch (error) {
+        console.warn("Error while cancelling notifications:", error);
+    }
 
     const notifications = [];
-    let notificationId = 1000; 
+    let notificationId = 1000;
 
     const weekDaysMap = {
         "Sunday": 0,
@@ -65,7 +69,6 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
             return;
         }
 
-
         times.forEach((time, index) => {
             const [hour, minute] = time.split(":").map(Number);
             const instruction = instructions?.[index] || instructions?.[0] || '';
@@ -87,9 +90,11 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
                     }
 
                     if (startDateObj && startDateObj > today) {
+                        const originalDate = new Date(scheduledTime);
                         while (scheduledTime < startDateObj) {
-                            scheduledTime.setDate(scheduledTime.getDate() + 7); // Add one week
+                            scheduledTime.setDate(scheduledTime.getDate() + 7); 
                         }
+                        console.log(`Adjusted notification date from ${originalDate.toDateString()} to ${scheduledTime.toDateString()} due to start date`);
                     }
 
                     notifications.push(createNotification(
@@ -116,7 +121,6 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
                 if (startDateObj && startDateObj > today) {
                     const daysUntilStart = Math.ceil((startDateObj - today) / (1000 * 60 * 60 * 24));
                     scheduledTime.setDate(scheduledTime.getDate() + daysUntilStart);
-
                     scheduledTime.setHours(hour, minute, 0, 0);
                 }
 
@@ -208,16 +212,37 @@ function createNotification(id, medicineName, dosage, instruction, scheduledTime
     return notificationObj;
 }
 
+
 export const cancelAllNotifications = async () => {
     try {
-        await LocalNotifications.cancelAll();
-        console.log("All notifications cancelled");
+        const pending = await LocalNotifications.getPending();
+
+        if (pending && pending.notifications && pending.notifications.length > 0) {
+            console.log(`Found ${pending.notifications.length} pending notifications to cancel`);
+
+            for (const notification of pending.notifications) {
+                try {
+                    await LocalNotifications.cancel({
+                        notifications: [{ id: notification.id }]
+                    });
+                    console.log(`Cancelled notification ID: ${notification.id}`);
+                } catch (innerError) {
+                    console.warn(`Failed to cancel notification ID: ${notification.id}`, innerError);
+                }
+            }
+
+            console.log("All pending notifications cancelled individually");
+        } else {
+            console.log("No pending notifications to cancel");
+        }
+
         return true;
     } catch (error) {
-        console.error("Error cancelling notifications:", error);
-        return false;
+        console.error("Error during notification cancellation process:", error);
+        throw error; 
     }
 };
+
 
 export const checkPendingNotifications = async () => {
     try {
@@ -226,6 +251,32 @@ export const checkPendingNotifications = async () => {
         return pending;
     } catch (error) {
         console.error("Error checking pending notifications:", error);
-        return [];
+        return { notifications: [] };
+    }
+};
+
+
+export const checkNotificationPermission = async () => {
+    try {
+        const permission = await LocalNotifications.checkPermissions();
+        console.log("Notification permission status:", permission.display);
+        return permission;
+    } catch (error) {
+        console.error("Error checking notification permissions:", error);
+        return { display: 'unknown' };
+    }
+};
+
+
+export const cancelNotificationById = async (notificationId) => {
+    try {
+        await LocalNotifications.cancel({
+            notifications: [{ id: notificationId }]
+        });
+        console.log(`Notification with ID ${notificationId} cancelled successfully`);
+        return true;
+    } catch (error) {
+        console.error(`Error cancelling notification ID ${notificationId}:`, error);
+        return false;
     }
 };

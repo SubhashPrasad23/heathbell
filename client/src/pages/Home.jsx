@@ -273,10 +273,10 @@ const Home = () => {
           >
             <div className="flex justify-between items-start font-MontSerrat">
               <div>
-                <h3 className="font-bold uppercase">{selectedPatient.name}</h3>
-                <p className="text-sm text-gray-500">
-                  {selectedPatient.age} years • {selectedPatient.gender}
-                </p>
+                <h3 className="font-bold uppercase">{selectedPatient?.name}</h3>
+                {selectedPatient?.age&&<p className="text-sm text-gray-500">
+                  {selectedPatient?.age} years • {selectedPatient?.gender||""}
+                </p>}
               </div>
               <button
                 onClick={() => setIsPatientDialogOpen(true)}

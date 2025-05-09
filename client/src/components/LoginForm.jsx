@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../features/user/userSlice";
+import { motion } from "framer-motion"
 
 const LoginForm = () => {
   const [form, setForm] = useState({ email: "", password: "12345" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
 
   const dispatch = useDispatch();
 
@@ -62,6 +64,9 @@ const LoginForm = () => {
       }
     } catch (error) {
       console.error(error);
+      setLoginError(
+        error?.response?.data || "Invalid email or password"
+      );
     } finally {
       setIsLoading(false)
     }
@@ -70,6 +75,15 @@ const LoginForm = () => {
   return (
 
     <form onSubmit={handleSubmit} className="space-y-5 w-full ">
+      {loginError && <motion.p
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        className="text-red-500  text-center tracking-wider"
+      >
+        {loginError}
+      </motion.p>}
+
       <Input
         type="email"
         name="email"
