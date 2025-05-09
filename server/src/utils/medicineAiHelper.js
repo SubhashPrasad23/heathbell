@@ -64,7 +64,6 @@ Return ONLY this exact JSON. Do not include extra explanation, formatting, or te
     });
 
     const rawText = response?.choices?.[0]?.message?.content || "";
-    console.log("🔍 Raw AI Response:\n", rawText);
 
     if (
       rawText.includes('"error": "No information found for this medicine."')

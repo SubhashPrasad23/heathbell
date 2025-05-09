@@ -6,6 +6,8 @@ const authRouter = require("./src/routes/authRouter");
 const patientRouter = require("./src/routes/patientRouter");
 const medicineRouter = require("./src/routes/medicineRouter");
 const medicineInfoRouter = require("./src/routes/medicineInfoAiRouter");
+const profileRouter = require("./src/routes/profileRouter");
+
 
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -37,7 +39,7 @@ app.use("/auth", authRouter);
 app.use("/patient", patientRouter);
 app.use("/medicine", medicineRouter);
 app.use("/search", medicineInfoRouter);
-
+app.use("/user",profileRouter)
 
 connectDB()
   .then(() => {
