@@ -7,9 +7,11 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../features/user/userSlice";
 import { motion } from "framer-motion"
+import { Toast } from '@capacitor/toast';
+
 
 const LoginForm = () => {
-  const [form, setForm] = useState({ email: "", password: "12345" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +62,10 @@ const LoginForm = () => {
       );
       dispatch(addUser(response.data.data))
       if (response.status === 200) {
+         await Toast.show({
+                  text: "Login successfully",
+                  duration: 'short',
+                })
         navigate("/");
       }
     } catch (error) {

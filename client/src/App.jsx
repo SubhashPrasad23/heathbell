@@ -1,7 +1,7 @@
 import "./index.css";
 import { useEffect, useState } from "react";
 import MainLayout from "./layout/MainLayout";
-import { checkPendingNotifications, scheduleMultipleNightlyNotifications, checkNotificationPermission } from "./utils/notifications";
+import { checkPendingNotifications, scheduleMultipleNightlyNotifications, checkNotificationPermission, scheduleNotifications } from "./utils/notifications";
 import { useSelector } from "react-redux";
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
@@ -26,7 +26,7 @@ function App() {
           }
 
           // Schedule notifications
-          const result = await scheduleMultipleNightlyNotifications(medicineList);
+          const result = await scheduleNotifications(medicineList);
           console.log(`Notification scheduling result: ${result ? 'Success' : 'Failed'}`);
 
           if (result) {
