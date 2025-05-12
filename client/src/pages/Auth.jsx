@@ -8,7 +8,7 @@ const Auth = () => {
   const [activeIndex, setActiveIndex] = useState(1)
 
   const tabs = [
-    { name: "Signup", component: <SignupForm /> },
+    { name: "Signup", component: <SignupForm setActiveIndex={setActiveIndex}/> },
     { name: "Login", component: <LoginForm  /> },
   ]
 

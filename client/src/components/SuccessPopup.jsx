@@ -5,16 +5,16 @@ import { useNavigate } from "react-router-dom";
 const SuccessPopup = ({ message, onClose }) => {
 
 
-    const navigate=useNavigate()
+  const navigate = useNavigate()
 
 
 
-    const handleGoHome = () => {
-      if (onClose) onClose(); // Hide the popup
-      setTimeout(() => {
-        navigate("/"); // Ensure navigation happens after unmount
-      }, 100); // Small delay ensures React finishes unmounting
-    };
+  const handleGoHome = () => {
+    if (onClose) onClose(); // Hide the popup
+    setTimeout(() => {
+      navigate("/"); // Ensure navigation happens after unmount
+    }, 100); // Small delay ensures React finishes unmounting
+  };
 
   return (
     <div className=" p-5 relative max-w-md w-full ">
@@ -30,7 +30,7 @@ const SuccessPopup = ({ message, onClose }) => {
         </span>
 
         <button onClick={handleGoHome}
- className=" bg-white py-2 px-4 rounded-lg shadow-inner shadow-gray-300 cursor-pointer text-teal-700">
+          className=" bg-white py-2 px-4 rounded-lg shadow-inner shadow-gray-300 cursor-pointer text-teal-700">
           Go Home
         </button>
       </div>

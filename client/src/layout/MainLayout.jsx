@@ -2,7 +2,6 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import BottomTab from "../components/BottomTab";
 import Header from "../components/Header";
-// import { scheduleTestNotification } from "../utils/notifications";
 
 const MainLayout = () => {
   return (
@@ -12,7 +11,6 @@ const MainLayout = () => {
         <div className="flex-1 overflow-auto p-5">
           <Outlet />
         </div>
-        {/* <button onClick={scheduleTestNotification}>click </button> */}
         <BottomTab />
       </div>
     </div>

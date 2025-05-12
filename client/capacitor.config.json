@@ -18,6 +18,11 @@
     "LocalNotifications": {
       "iconColor": "#488AFF",
       "sound": "reminder"
+    },
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "DARK",
+      "backgroundColor": "#ffffffff"
     }
   }
 }

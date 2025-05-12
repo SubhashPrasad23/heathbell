@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
 import axios from "axios";
+import { Toast } from '@capacitor/toast';
 
-const SignupForm = () => {
+
+const SignupForm = ({ setActiveIndex }) => {
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -74,8 +76,19 @@ const SignupForm = () => {
         { withCredentials: true }
       );
       console.log(response);
+      if(response.status==201){
+        await Toast.show({
+          text: "You're successfully registered with HealthBell.",
+          duration: 'short',
+        });
+        setActiveIndex(1)
+      }
     } catch (error) {
       console.log(error);
+      await Toast.show({
+        text: 'Signup failed. Try again.',
+        duration: 'short',
+      });
     } finally {
       setIsLoading(false)
 

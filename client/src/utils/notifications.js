@@ -15,6 +15,9 @@ const LocalNotifications = registerPlugin('LocalNotifications');
  *    - Notifications will only trigger on those specific days
  */
 export const scheduleMultipleNightlyNotifications = async (medicineList) => {
+    console.log("=== STARTING NOTIFICATION SCHEDULING PROCESS ===");
+    console.log(`Received medicine list with ${medicineList?.length || 0} items`);
+
     if (Capacitor.getPlatform() !== 'android') {
         console.warn("This notification code only runs on Android native platform.");
         return false;
@@ -38,6 +41,7 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
     });
 
     try {
+        console.log("Cancelling all existing notifications before scheduling new ones");
         await cancelAllNotifications();
     } catch (error) {
         console.warn("Error while cancelling notifications:", error);
@@ -56,47 +60,98 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
         "Saturday": 6
     };
 
+    // Get today's date at midnight in the user's local timezone
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    medicineList.forEach((medicine) => {
+    console.log(`Current date for scheduling: ${today.toString()}`);
+    console.log(`Timezone offset: ${today.getTimezoneOffset()} minutes from UTC`);
+
+    // Process each medicine
+    for (const medicine of medicineList) {
         const { name, dosage, times, daysOfWeek, instructions, startDate, endDate } = medicine;
 
-        const startDateObj = startDate ? new Date(startDate) : null;
-        const endDateObj = endDate ? new Date(endDate) : null;
+        console.log(`\n=== Processing medicine: ${name} ===`);
+        console.log(`Dosage: ${dosage}`);
+        console.log(`Times: ${JSON.stringify(times)}`);
+        console.log(`Days of Week: ${JSON.stringify(daysOfWeek)}`);
+        console.log(`Start Date: ${startDate || 'Not specified'}`);
+        console.log(`End Date: ${endDate || 'Not specified'}`);
 
-        if (endDateObj && endDateObj < today) {
-            return;
+        // Convert string dates to Date objects with time set to midnight in local timezone
+        const startDateObj = startDate ? new Date(startDate) : null;
+        if (startDateObj) {
+            startDateObj.setHours(0, 0, 0, 0);
+            console.log(`Start date parsed as: ${startDateObj.toString()} (local time)`);
         }
 
-        times.forEach((time, index) => {
-            const [hour, minute] = time.split(":").map(Number);
-            const instruction = instructions?.[index] || instructions?.[0] || '';
+        const endDateObj = endDate ? new Date(endDate) : null;
+        if (endDateObj) {
+            endDateObj.setHours(23, 59, 59, 999); // End of day for end date
+            console.log(`End date parsed as: ${endDateObj.toString()} (local time)`);
+        }
 
+        // Skip if end date is in the past
+        if (endDateObj && endDateObj < today) {
+            console.log(`Skipping medicine ${name}: end date ${endDate} has passed`);
+            continue;
+        }
+
+        // Process each time for this medicine
+        for (const time of times) {
+            console.log(`\n--- Processing time: ${time} for ${name} ---`);
+            const [hour, minute] = time.split(":").map(Number);
+            const instruction = Array.isArray(instructions) && instructions.length > 0
+                ? instructions[times.indexOf(time)] || instructions[0] || ''
+                : instructions || '';
+
+            // If specific days are configured
             if (daysOfWeek && daysOfWeek.length > 0) {
-                daysOfWeek.forEach(dayName => {
+                console.log(`Setting up notifications for specific days: ${daysOfWeek.join(', ')}`);
+
+                for (const dayName of daysOfWeek) {
                     const dayNumber = weekDaysMap[dayName];
 
                     if (dayNumber === undefined) {
                         console.warn(`Invalid day name: ${dayName}`);
-                        return;
+                        continue;
                     }
 
-                    const scheduledTime = getNextDayOfWeek(dayNumber, hour, minute);
+                    console.log(`\n--- Setting up notification for ${name} on ${dayName} at ${hour}:${minute} ---`);
 
-                    if (endDateObj && scheduledTime > endDateObj) {
-                        console.log(`Skipping notification for ${name} on ${scheduledTime.toDateString()}: after end date`);
-                        return;
-                    }
+                    // Get next occurrence of this day
+                    let scheduledTime = getNextDayOfWeek(dayNumber, hour, minute);
+                    console.log(`Initial scheduled time: ${scheduledTime.toISOString()}`);
 
-                    if (startDateObj && startDateObj > today) {
-                        const originalDate = new Date(scheduledTime);
-                        while (scheduledTime < startDateObj) {
-                            scheduledTime.setDate(scheduledTime.getDate() + 7); 
+                    // Handle start date restriction
+                    if (startDateObj) {
+                        console.log(`Checking start date: ${startDateObj.toString()}`);
+                        console.log(`Initial scheduled time: ${scheduledTime.toString()}`);
+                        console.log(`Comparison result: scheduledTime < startDateObj = ${scheduledTime < startDateObj}`);
+
+                        // If scheduled date is before start date, find first valid occurrence after start date
+                        if (scheduledTime < startDateObj) {
+                            const originalDate = new Date(scheduledTime);
+
+                            // Keep adding weeks until we're after the start date
+                            while (scheduledTime < startDateObj) {
+                                scheduledTime.setDate(scheduledTime.getDate() + 7);
+                                console.log(`Shifting date forward by 1 week to: ${scheduledTime.toString()}`);
+                            }
+
+                            console.log(`Adjusted notification date from ${originalDate.toString()} to ${scheduledTime.toString()} due to start date restriction`);
                         }
-                        console.log(`Adjusted notification date from ${originalDate.toDateString()} to ${scheduledTime.toDateString()} due to start date`);
                     }
 
+                    // Skip if the adjusted date is after end date
+                    if (endDateObj && scheduledTime > endDateObj) {
+                        console.log(`Comparing: ${scheduledTime.toString()} > ${endDateObj.toString()} = ${scheduledTime > endDateObj}`);
+                        console.log(`Skipping notification for ${name} on ${dayName}: after end date ${endDate}`);
+                        continue;
+                    }
+
+                    // Create and add the notification
+                    console.log(`Creating weekly notification for ${name} on ${dayName} at ${hour}:${minute}`);
                     notifications.push(createNotification(
                         notificationId++,
                         name,
@@ -105,26 +160,55 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
                         scheduledTime,
                         dayNumber
                     ));
-                });
+                }
             } else {
-                const scheduledTime = new Date();
-                scheduledTime.setHours(hour, minute, 0, 0);
+                console.log(`Setting up daily notification for ${name} at ${hour}:${minute}`);
 
+                let scheduledTime = new Date();
+                scheduledTime.setHours(hour, minute, 0, 0);
+                console.log(`Initial scheduled time: ${scheduledTime.toISOString()}`);
+
+                // If the time has already passed today, schedule for tomorrow
                 if (scheduledTime <= new Date()) {
                     scheduledTime.setDate(scheduledTime.getDate() + 1);
+                    console.log(`Time ${hour}:${minute} already passed today, scheduling for tomorrow: ${scheduledTime.toISOString()}`);
+                }
+
+                // Handle start date restriction
+                if (startDateObj) {
+                    console.log(`Checking start date: ${startDateObj.toString()}`);
+                    console.log(`Today's date for comparison: ${today.toString()}`);
+                    console.log(`Comparison result: startDateObj > today = ${startDateObj > today}`);
+
+                    if (startDateObj > today) {
+                        // If start date is in the future, schedule from start date
+                        console.log(`Start date is in the future, adjusting scheduled time`);
+                        const originalScheduledTime = new Date(scheduledTime);
+                        scheduledTime = new Date(startDateObj);
+                        scheduledTime.setHours(hour, minute, 0, 0);
+
+                        // If the time has already passed on start date, schedule for next day
+                        const currentTime = new Date();
+                        if (startDateObj.getDate() === currentTime.getDate() &&
+                            (hour < currentTime.getHours() ||
+                                (hour === currentTime.getHours() && minute <= currentTime.getMinutes()))) {
+                            scheduledTime.setDate(scheduledTime.getDate() + 1);
+                            console.log(`Time has already passed on start date, scheduling for next day: ${scheduledTime.toString()}`);
+                        }
+
+                        console.log(`Changed scheduled time from ${originalScheduledTime.toString()} to ${scheduledTime.toString()}`);
+                    }
+
+                    console.log(`Adjusted scheduled time for start date: ${scheduledTime.toString()}`);
                 }
 
                 if (endDateObj && scheduledTime > endDateObj) {
-                    return;
+                    console.log(`Skipping notification for ${name}: scheduled time is after end date ${endDate}`);
+                    continue;
                 }
 
-                if (startDateObj && startDateObj > today) {
-                    const daysUntilStart = Math.ceil((startDateObj - today) / (1000 * 60 * 60 * 24));
-                    scheduledTime.setDate(scheduledTime.getDate() + daysUntilStart);
-                    scheduledTime.setHours(hour, minute, 0, 0);
-                }
-
-                notifications.push(createNotification(
+                console.log(`Creating daily notification for ${name} at ${hour}:${minute}`);
+                notifications.push(createDailyNotification(
                     notificationId++,
                     name,
                     dosage,
@@ -132,20 +216,22 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
                     scheduledTime
                 ));
             }
-        });
-    });
+        }
+    }
 
     if (notifications.length === 0) {
         console.log("No valid notifications to schedule");
         return false;
     }
 
+    console.log(`Preparing to schedule ${notifications.length} notifications`);
+
     try {
         const notifs = await LocalNotifications.schedule({
             notifications,
         });
 
-        console.log("Notifications scheduled:", JSON.stringify(notifs));
+        console.log(`Successfully scheduled ${notifs.notifications?.length || 0} notifications`);
         return true;
     } catch (error) {
         console.error("Error scheduling notifications:", error);
@@ -153,39 +239,68 @@ export const scheduleMultipleNightlyNotifications = async (medicineList) => {
     }
 };
 
+
 function getNextDayOfWeek(dayOfWeek, hour, minute) {
+    // Get the current date and time in the user's local timezone
     const now = new Date();
-    const date = new Date();
-    date.setHours(hour, minute, 0, 0);
+    console.log(`Calculating next ${getDayName(dayOfWeek)} from current time: ${now.toString()}`);
+    console.log(`Current day: ${getDayName(now.getDay())}, Current hour: ${now.getHours()}, Current minute: ${now.getMinutes()}`);
 
-    const currentDayOfWeek = date.getDay();
+    // Create a date object for today (in local timezone)
+    const result = new Date(now);
+    result.setHours(hour, minute, 0, 0);
 
-    let daysToAdd = dayOfWeek - currentDayOfWeek;
+    // Calculate days until the next occurrence of this day of week
+    const currentDay = now.getDay();
+    let daysToAdd = (dayOfWeek - currentDay + 7) % 7;
 
-    if ((daysToAdd === 0 && date <= now) || daysToAdd < 0) {
-        daysToAdd += 7;
+    // If it's the same day (daysToAdd === 0) and the time has already passed, we need to go to next week
+    if (daysToAdd === 0) {
+        if (hour < now.getHours() ||
+            (hour === now.getHours() && minute <= now.getMinutes())) {
+            daysToAdd = 7;
+            console.log(`Time ${hour}:${minute} has already passed today, scheduling for next week`);
+        }
     }
 
-    date.setDate(date.getDate() + daysToAdd);
+    result.setDate(result.getDate() + daysToAdd);
+    console.log(`Next ${getDayName(dayOfWeek)} calculated: ${result.toString()}`);
+    console.log(`In local time: ${result.toLocaleString()}`);
 
-    console.log(`Next ${getDayName(dayOfWeek)} at ${hour}:${minute} is ${date.toISOString()}`);
-    return date;
+    return result;
 }
+
 
 function getDayName(dayNumber) {
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     return days[dayNumber];
 }
 
-function createNotification(id, medicineName, dosage, instruction, scheduledTime, dayOfWeek = null) {
+
+function createNotification(id, medicineName, dosage, instruction, scheduledTime, dayOfWeek) {
+    const notificationTime = new Date(scheduledTime);
+
+    notificationTime.setSeconds(0, 0);
+
+    console.log(`Creating notification #${id} for ${medicineName}:`);
+    console.log(`- First occurrence: ${notificationTime.toString()}`);
+    console.log(`- Local time: ${notificationTime.toLocaleString()}`);
+    console.log(`- Weekly on ${getDayName(dayOfWeek)}`);
+    console.log(`- Dosage: ${dosage}`);
+    console.log(`- Instruction: ${instruction}`);
+
     const notificationObj = {
         title: `Time to take ${medicineName}`,
-        body: `${dosage} — ${instruction ? `Take ${instruction.toLowerCase()}` : ''}`,
+        body: `${dosage}${instruction ? ` — Take ${instruction.toLowerCase()}` : ''}`,
         id: id,
         schedule: {
-            at: scheduledTime,
+            at: notificationTime,
             allowWhileIdle: true,
-            repeating: true
+            repeating: true,
+            every: "week",
+            on: {
+                weekday: dayOfWeek
+            }
         },
         sound: "reminder",
         channelId: "daily_reminder_channel",
@@ -193,25 +308,65 @@ function createNotification(id, medicineName, dosage, instruction, scheduledTime
             data: JSON.stringify({
                 medicineName: medicineName,
                 dosage: dosage,
-                instruction: instruction
+                instruction: instruction,
+                scheduled: notificationTime.toISOString(),
+                scheduledLocalTime: notificationTime.toLocaleString(),
+                day: getDayName(dayOfWeek)
             })
         },
-        ongoing: true,
-        autoCancel: false,
+        ongoing: false,
+        autoCancel: true,
         smallIcon: "ic_notification",
         largeIcon: "ic_launcher"
     };
 
-    if (dayOfWeek !== null) {
-        notificationObj.schedule.every = "week";
-        notificationObj.schedule.on = {
-            weekday: dayOfWeek
-        };
-    }
-
     return notificationObj;
 }
 
+
+function createDailyNotification(id, medicineName, dosage, instruction, scheduledTime) {
+    const notificationTime = new Date(scheduledTime);
+
+    // Ensure we're working with a clean time
+    notificationTime.setSeconds(0, 0);
+
+    console.log(`Creating daily notification #${id} for ${medicineName}:`);
+    console.log(`- First occurrence: ${notificationTime.toString()}`);
+    console.log(`- Local time: ${notificationTime.toLocaleString()}`);
+    console.log(`- Repeating: Daily`);
+    console.log(`- Dosage: ${dosage}`);
+    console.log(`- Instruction: ${instruction}`);
+
+    const notificationObj = {
+        title: `Time to take ${medicineName}`,
+        body: `${dosage}${instruction ? ` — Take ${instruction.toLowerCase()}` : ''}`,
+        id: id,
+        schedule: {
+            at: notificationTime,
+            allowWhileIdle: true,
+            repeating: true,
+            every: "day"
+        },
+        sound: "reminder",
+        channelId: "daily_reminder_channel",
+        extra: {
+            data: JSON.stringify({
+                medicineName: medicineName,
+                dosage: dosage,
+                instruction: instruction,
+                scheduled: notificationTime.toISOString(),
+                scheduledLocalTime: notificationTime.toLocaleString(),
+                daily: true
+            })
+        },
+        ongoing: false,
+        autoCancel: true,
+        smallIcon: "ic_notification",
+        largeIcon: "ic_launcher"
+    };
+
+    return notificationObj;
+}
 
 export const cancelAllNotifications = async () => {
     try {
@@ -219,6 +374,17 @@ export const cancelAllNotifications = async () => {
 
         if (pending && pending.notifications && pending.notifications.length > 0) {
             console.log(`Found ${pending.notifications.length} pending notifications to cancel`);
+
+            const platform = Capacitor.getPlatform();
+            if (platform !== 'android') {
+                try {
+                    await LocalNotifications.cancelAll();
+                    console.log("Successfully cancelled all notifications at once");
+                    return true;
+                } catch (bulkError) {
+                    console.warn("Bulk cancellation failed, trying individual cancellation", bulkError);
+                }
+            }
 
             for (const notification of pending.notifications) {
                 try {
@@ -230,8 +396,6 @@ export const cancelAllNotifications = async () => {
                     console.warn(`Failed to cancel notification ID: ${notification.id}`, innerError);
                 }
             }
-
-            console.log("All pending notifications cancelled individually");
         } else {
             console.log("No pending notifications to cancel");
         }
@@ -239,7 +403,7 @@ export const cancelAllNotifications = async () => {
         return true;
     } catch (error) {
         console.error("Error during notification cancellation process:", error);
-        throw error; 
+        throw error;
     }
 };
 
@@ -247,25 +411,76 @@ export const cancelAllNotifications = async () => {
 export const checkPendingNotifications = async () => {
     try {
         const pending = await LocalNotifications.getPending();
-        console.log("Pending notifications:", JSON.stringify(pending));
+        console.log("=== PENDING NOTIFICATIONS ===");
+
+        if (pending && pending.notifications && pending.notifications.length > 0) {
+            console.log(`Found ${pending.notifications.length} pending notifications`);
+
+            // Log each notification for debugging
+            pending.notifications.forEach((notification, index) => {
+                console.log(`\nNotification #${index + 1}:`);
+                console.log(`  ID: ${notification.id}`);
+                console.log(`  Title: ${notification.title}`);
+                console.log(`  Body: ${notification.body}`);
+
+                if (notification.schedule) {
+                    if (notification.schedule.at) {
+                        console.log(`  Scheduled at: ${new Date(notification.schedule.at).toLocaleString()}`);
+                    }
+                    if (notification.schedule.every) {
+                        console.log(`  Repeating: ${notification.schedule.every}`);
+                    }
+                    if (notification.schedule.on && notification.schedule.on.weekday !== undefined) {
+                        console.log(`  On day: ${getDayName(notification.schedule.on.weekday)}`);
+                    }
+                }
+
+                if (notification.extra && notification.extra.data) {
+                    try {
+                        const extraData = JSON.parse(notification.extra.data);
+                        console.log(`  Extra data: ${JSON.stringify(extraData)}`);
+                    } catch {
+                        console.log(`  Extra data: ${notification.extra.data} (failed to parse)`);
+                    }
+                }
+            });
+        } else {
+            console.log("No pending notifications found");
+        }
+
         return pending;
     } catch (error) {
         console.error("Error checking pending notifications:", error);
         return { notifications: [] };
     }
 };
-
-
 export const checkNotificationPermission = async () => {
     try {
-        const permission = await LocalNotifications.checkPermissions();
-        console.log("Notification permission status:", permission.display);
+        let permission = await LocalNotifications.checkPermissions();
+        console.log("Initial notification permission status:", permission.display);
+
+        if (permission.display !== 'granted') {
+            permission = await LocalNotifications.requestPermissions();
+            console.log("Permission after request:", permission.display);
+        }
+
         return permission;
     } catch (error) {
-        console.error("Error checking notification permissions:", error);
+        console.error("Error checking/requesting notification permissions:", error);
         return { display: 'unknown' };
     }
-};
+  };
+
+// export const checkNotificationPermission = async () => {
+//     try {
+//         const permission = await LocalNotifications.checkPermissions();
+//         console.log("Notification permission status:", permission.display);
+//         return permission;
+//     } catch (error) {
+//         console.error("Error checking notification permissions:", error);
+//         return { display: 'unknown' };
+//     }
+// };
 
 
 export const cancelNotificationById = async (notificationId) => {
